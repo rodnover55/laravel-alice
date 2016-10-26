@@ -1,10 +1,9 @@
 <?php
-namespace Rnr\Tests\Alice\Support;
+namespace Rnr\Tests\Alice;
 
 
 use Illuminate\Database\DatabaseManager;
-use Rnr\Alice\Support\RangeQueryObject;
-use Rnr\Tests\Alice\TestCase;
+use Rnr\Alice\RangeQueryObject;
 
 class RangeQueryObjectTest extends TestCase
 {
@@ -20,12 +19,12 @@ class RangeQueryObjectTest extends TestCase
             ->setRange('1,5,7-10, 15, 18-20')
             ->setField('field');
 
-        $this->ranger->apply($query);
+        $this->ranger->applyTo($query);
 
         $this->assertEquals(
-            "select * from `test` where `field` in (?, ?, ?) or " .
-            "`field` between ? and ? or " .
-            "`field` between ? and ?", $query->toSql());
+            'select * from "test" where "field" in (?, ?, ?) or ' .
+            '"field" between ? and ? or ' .
+            '"field" between ? and ?', $query->toSql());
 
         $this->assertEquals([
             1, 5, 15, 7, 10, 18, 20

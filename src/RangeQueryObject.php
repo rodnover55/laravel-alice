@@ -1,5 +1,5 @@
 <?php
-namespace Rnr\Alice\Support;
+namespace Rnr\Alice;
 
 
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
@@ -14,7 +14,7 @@ class RangeQueryObject
      * @param QueryBuilder|EloquentBuilder $query
      * @return QueryBuilder|EloquentBuilder
      */
-    public function apply($query) {
+    public function applyTo($query) {
         $ranges = $this->parse($this->range);
 
         $this
