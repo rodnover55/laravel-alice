@@ -19,7 +19,7 @@
         "psr-4": {
             "Rnr\\Tests\\Alice\\": "tests"
         }
-    },,
+    },
     "authors": [
         {
             "name": "Sergei Melnikov",
