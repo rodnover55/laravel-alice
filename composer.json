@@ -1,0 +1,29 @@
+{
+    "name": "rnr/laravel-alice",
+    "description": "Wrapper of alice fixture generator for laravel",
+    "type": "library",
+    "require": {
+        "nelmio/alice": "~2.2",
+        "laravel/framework": "~5.1"
+    },
+    "require-dev": {
+        "orchestra/testbench": "~3.1",
+        "phpunit/phpunit": "~5.5"
+    },
+    "autoload": {
+        "psr-4": {
+            "Rnr\\Alice\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Rnr\\Tests\\Alice\\": "tests"
+        }
+    },,
+    "authors": [
+        {
+            "name": "Sergei Melnikov",
+            "email": "me@rnr.name"
+        }
+    ]
+}
