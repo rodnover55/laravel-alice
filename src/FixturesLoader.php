@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use Nelmio\Alice\Fixtures\Loader;
 use Rnr\Alice\Instantiators\ModelWrapper;
 use Rnr\Alice\Instantiators\ModelWrapperInstantiator;
+use Rnr\Alice\Populators\BelongsToPopulator;
 use Rnr\Alice\Populators\SimplePopulator;
 
 class FixturesLoader
@@ -20,6 +21,10 @@ class FixturesLoader
         $this->container = $container;
     }
 
+    /**
+     * @param string|array $files
+     * @return array|Model[]
+     */
     public function load($files) {
         /** @var Model[] $entities */
         $entities = [];
@@ -48,6 +53,7 @@ class FixturesLoader
         /** @var Loader $loader */
         $loader = $this->container->make(Loader::class);
         $loader->addPopulator($this->container->make(SimplePopulator::class));
+        $loader->addPopulator($this->container->make(BelongsToPopulator::class));
         $loader->addInstantiator($this->container->make(ModelWrapperInstantiator::class));
 
         return $loader->load($file);

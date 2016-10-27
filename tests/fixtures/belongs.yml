@@ -1,0 +1,6 @@
+Rnr\Tests\Alice\Mocks\TestModel:
+  test-1:
+    field1: string-1
+Rnr\Tests\Alice\Mocks\RelationsModel:
+  belongs-1:
+    belongs: '@test-1'
