@@ -17,23 +17,56 @@ class GenerateFixtureCommandTest extends TestCase
     /** @var ModelExtractor */
     private $extractor;
 
-    public function testExecute() {
+
+    /**
+     * @dataProvider argumentsProvider
+     * @param $actual
+     * @param $arguments
+     */
+    public function testExecute($actual, $arguments) {
         $this->artisan('db:generate-fixture', [
-            'models' => [
-                TestModel::class . '=1,2,3',
-                Test2Model::class . '=1-15',
-                Model::class
-            ]
+            'models' => [$arguments]
         ]);
 
-        $this->assertEquals([
-            TestModel::class => '1,2,3',
-            Test2Model::class => '1-15',
-            Model::class => '*'
-        ], $this->extractor->criteria);
+        $this->assertEquals($actual, $this->extractor->criteria);
     }
 
-    public function testAssociation() {}
+    public function argumentsProvider() {
+        return [
+            'is series' => [
+                [TestModel::class => [
+                    'range' =>'1,2,3'
+                ]],
+                TestModel::class . '=1,2,3'
+            ],
+            'range' => [
+                [TestModel::class => [
+                    'range' => '1-15'
+                ]],
+                TestModel::class . '=1-15'
+            ],
+            'all' => [
+                [TestModel::class => [
+                    'range' => '*'
+                ]],
+                TestModel::class
+            ],
+            'all with relations' => [
+                [TestModel::class => [
+                        'range' => '*',
+                        'relations' =>['test', 'test.test2']
+                ]],
+                TestModel::class . '(relations:test,test.test2)'
+            ],
+            'all with range' => [
+                [TestModel::class => [
+                    'range' => '1-5',
+                    'relations' =>['test', 'test.test2']
+                ]],
+                TestModel::class . '(relations:test,test.test2)=1-5'
+            ]
+        ];
+    }
 
     protected function setUp()
     {
@@ -59,7 +92,5 @@ class GenerateFixtureCommandTest extends TestCase
         /** @var Kernel $kernel */
         $kernel = $this->app->make(KernelContract::class);
         $kernel->registerCommand($this->app->make(GenerateFixtureCommand::class));
-
     }
-
 }
