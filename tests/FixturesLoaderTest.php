@@ -11,13 +11,13 @@ use Rnr\Tests\Alice\Mocks\TestModel;
 class FixturesLoaderTest extends TestCase
 {
     public function testLoadData() {
-        $objects = $this->fixturesLoader->load('fixtures/data.yml');
+        $objects = $this->fixturesLoader->load(__DIR__ . '/fixtures/data.yml');
 
         $this->assertObjectsInDatabase($objects);
     }
 
     public function testBelongsTo() {
-        $objects = $this->fixturesLoader->load('fixtures/belongs.yml');
+        $objects = $this->fixturesLoader->load(__DIR__ . '/fixtures/belongs.yml');
 
         $this->assertObjectsInDatabase($objects);
 
@@ -28,7 +28,7 @@ class FixturesLoaderTest extends TestCase
     }
 
     public function testHasOne() {
-        $objects = $this->fixturesLoader->load('fixtures/hasOne.yml');
+        $objects = $this->fixturesLoader->load(__DIR__ . '/fixtures/hasOne.yml');
 
         $this->assertObjectsInDatabase($objects);
 
@@ -39,7 +39,7 @@ class FixturesLoaderTest extends TestCase
     }
 
     public function testHasMany() {
-        $objects = $this->fixturesLoader->load('fixtures/hasMany.yml');
+        $objects = $this->fixturesLoader->load(__DIR__ . '/fixtures/hasMany.yml');
 
         $this->assertObjectsInDatabase($objects);
 
@@ -53,7 +53,7 @@ class FixturesLoaderTest extends TestCase
     }
 
     public function testBelongsToMany() {
-        $objects = $this->fixturesLoader->load('fixtures/belongsToMany.yml');
+        $objects = $this->fixturesLoader->load(__DIR__ . '/fixtures/belongsToMany.yml');
 
         $this->assertObjectsInDatabase($objects);
 
