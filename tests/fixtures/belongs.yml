@@ -3,4 +3,5 @@ Rnr\Tests\Alice\Mocks\TestModel:
     field1: string-1
 Rnr\Tests\Alice\Mocks\RelationsModel:
   belongs-1:
+    id: ~
     belongs: '@test-1'

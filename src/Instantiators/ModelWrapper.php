@@ -3,6 +3,8 @@ namespace Rnr\Alice\Instantiators;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOneOrMany;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use ReflectionMethod;
 use ReflectionException;
@@ -15,6 +17,9 @@ class ModelWrapper
 
     /** @var array|self[]  */
     private $belongsTo = [];
+
+    /** @var array|self[][] */
+    private $many = [];
 
     /**
      * @return Model
@@ -45,7 +50,7 @@ class ModelWrapper
         $this->model->{$name} = $value;
     }
 
-    public function save() {
+    public function save(HasOneOrMany $relation = null) {
         foreach ($this->belongsTo as $name => $model) {
             if ($model->isDirty()) {
                 $model->save();
@@ -54,7 +59,19 @@ class ModelWrapper
             $this->getRelation($name)->associate($model->getModel());
         }
 
-        return $this->model->save();
+        $result = (empty($relation)) ? ($this->model->save()) : ($relation->save($this->model));
+
+        foreach ($this->many as $name => $models) {
+            $relation = $this->getRelation($name);
+
+            foreach ($models as $model) {
+                if ($model->isDirty()) {
+                    $model->save($relation);
+                }
+            }
+        }
+
+        return $result;
     }
 
     public function hasBelongTo($name) {
@@ -67,9 +84,19 @@ class ModelWrapper
         }
     }
 
+    public function hasMany($name) {
+        try {
+            $relation = $this->getRelation($name);
+
+            return $relation instanceof HasOneOrMany;
+        } catch (RelationNotFoundException $e) {
+            return false;
+        }
+    }
+
     /**
      * @param $name
-     * @return BelongsTo
+     * @return HasMany
      * @throws RelationNotFoundException
      */
     public function getRelation($name) {
@@ -94,6 +121,14 @@ class ModelWrapper
 
     public function addBelongTo($relation, $object) {
         $this->belongsTo[$relation] = $object;
+    }
+
+    public function addMany($relation, array $objects) {
+        $this->many[$relation] = ($this->many[$relation] ?? []) + $objects;
+    }
+
+    public function addOne($relation, $object) {
+        $this->addMany($relation, [$object]);
     }
 
     public function isDirty() {

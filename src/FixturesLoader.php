@@ -9,12 +9,21 @@ use Nelmio\Alice\Fixtures\Loader;
 use Rnr\Alice\Instantiators\ModelWrapper;
 use Rnr\Alice\Instantiators\ModelWrapperInstantiator;
 use Rnr\Alice\Populators\BelongsToPopulator;
+use Rnr\Alice\Populators\HasManyPopulator;
+use Rnr\Alice\Populators\HasOnePopulator;
 use Rnr\Alice\Populators\SimplePopulator;
 
 class FixturesLoader
 {
     /** @var Container  */
     private $container;
+
+    private $populators = [
+        SimplePopulator::class,
+        BelongsToPopulator::class,
+        HasManyPopulator::class,
+        HasOnePopulator::class
+    ];
 
     public function __construct(Container $container)
     {
@@ -26,7 +35,7 @@ class FixturesLoader
      * @return array|Model[]
      */
     public function load($files) {
-        /** @var Model[] $entities */
+        /** @var ModelWrapper[] $entities */
         $entities = [];
 
         foreach ((is_array($files) ? $files : [$files]) as $file) {
@@ -40,7 +49,9 @@ class FixturesLoader
 
         $connection->transaction(function () use (&$entities) {
             foreach ($entities as $entity) {
-                $entity->save();
+                if ($entity->isDirty()) {
+                    $entity->save();
+                }
             }
         });
 
@@ -49,11 +60,18 @@ class FixturesLoader
         }, $entities);
     }
 
+    /**
+     * @param string $file
+     * @return ModelWrapper[]|object[]
+     */
     public function loadFile($file) {
         /** @var Loader $loader */
         $loader = $this->container->make(Loader::class);
-        $loader->addPopulator($this->container->make(SimplePopulator::class));
-        $loader->addPopulator($this->container->make(BelongsToPopulator::class));
+
+        foreach ($this->populators as $populator) {
+            $loader->addPopulator($this->container->make($populator));
+        }
+
         $loader->addInstantiator($this->container->make(ModelWrapperInstantiator::class));
 
         return $loader->load($file);

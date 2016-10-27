@@ -46,4 +46,5 @@ class ModelExtractor
 
         return $entities;
     }
+
 }

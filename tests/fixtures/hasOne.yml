@@ -1,0 +1,8 @@
+Rnr\Tests\Alice\Mocks\TestModel:
+  test-1:
+    field1: 'string-1'
+    one: '@test2-1'
+
+Rnr\Tests\Alice\Mocks\Test2Model:
+  test2-1:
+    id2: ~
