@@ -24,10 +24,14 @@ class ModelExtractorTest extends TestCase
             Test2Model::class => '*'
         ]);
 
-        $this->assertEquals(
-            trim(file_get_contents($this->fixture)),
-            trim(Yaml::dump($data, 3, 2))
-        );
+        $expected = $this->normalize(file_get_contents($this->fixture));
+        $actual = $this->normalize(Yaml::dump($data, 3, 2));
+
+        $this->assertEquals($expected, $actual);
+    }
+
+    protected function normalize($content) {
+        return str_replace("\r\n", "\n", trim($content));
     }
 
     public function testExtractSelectively() {
@@ -43,10 +47,6 @@ class ModelExtractorTest extends TestCase
         );
     }
 
-    protected function prepareData() {
-
-    }
-
     protected function setUp()
     {
         parent::setUp();
@@ -59,6 +59,4 @@ class ModelExtractorTest extends TestCase
 
         $this->extractor = $this->app->make(ModelExtractor::class);
     }
-
-
 }
