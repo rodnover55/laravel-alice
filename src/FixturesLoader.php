@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use Nelmio\Alice\Fixtures\Loader;
 use Rnr\Alice\Instantiators\ModelWrapper;
 use Rnr\Alice\Instantiators\ModelWrapperInstantiator;
+use Rnr\Alice\Populators\BelongsToManyPopulator;
 use Rnr\Alice\Populators\BelongsToPopulator;
 use Rnr\Alice\Populators\HasManyPopulator;
 use Rnr\Alice\Populators\HasOnePopulator;
@@ -22,7 +23,8 @@ class FixturesLoader
         SimplePopulator::class,
         BelongsToPopulator::class,
         HasManyPopulator::class,
-        HasOnePopulator::class
+        HasOnePopulator::class,
+        BelongsToManyPopulator::class
     ];
 
     public function __construct(Container $container)

@@ -3,6 +3,7 @@ namespace Rnr\Alice\Instantiators;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOneOrMany;
 use Illuminate\Database\Eloquent\Relations\Relation;
@@ -20,6 +21,9 @@ class ModelWrapper
 
     /** @var array|self[][] */
     private $many = [];
+
+    /** @var array|self[][] */
+    private $manyToMany = [];
 
     /**
      * @return Model
@@ -71,6 +75,20 @@ class ModelWrapper
             }
         }
 
+        foreach ($this->manyToMany as $name => $models) {
+            $ids = [];
+
+            foreach ($models as $model) {
+                if ($model->isDirty()) {
+                    $model->save();
+                }
+
+                $ids[] = $model->getModel()->getKey();
+            }
+
+            $this->getRelation($name)->sync($ids);
+        }
+
         return $result;
     }
 
@@ -94,9 +112,19 @@ class ModelWrapper
         }
     }
 
+    public function hasBelongsToMany($name) {
+        try {
+            $relation = $this->getRelation($name);
+
+            return $relation instanceof BelongsToMany;
+        } catch (RelationNotFoundException $e) {
+            return false;
+        }
+    }
+
     /**
      * @param $name
-     * @return HasMany
+     * @return BelongsToMany
      * @throws RelationNotFoundException
      */
     public function getRelation($name) {
@@ -129,6 +157,10 @@ class ModelWrapper
 
     public function addOne($relation, $object) {
         $this->addMany($relation, [$object]);
+    }
+
+    public function addBelongToMany($relation, array $objects) {
+        $this->manyToMany[$relation] = ($this->manyToMany[$relation] ?? []) + $objects;
     }
 
     public function isDirty() {

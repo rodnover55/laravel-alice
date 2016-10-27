@@ -1,0 +1,15 @@
+Rnr\Tests\Alice\Mocks\TestModel:
+  test-{1..2}:
+    field1: 'string-<current()>'
+    manyToMany: '@test2-{1..2}'
+
+  test-not-linked:
+    field1: 'not linked'
+
+Rnr\Tests\Alice\Mocks\Test2Model:
+  test2-{1..2}:
+    intfield: '<current()> + 100'
+    manyToMany: '@test-{1..2}'
+
+  test2-not-linked:
+    intfield: 0

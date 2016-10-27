@@ -17,4 +17,8 @@ class TestModel extends Model
     public function one() {
         return $this->hasOne(Test2Model::class, 'intfield');
     }
+
+    public function manyToMany() {
+        return $this->belongsToMany(Test2Model::class, 'links', 'test_id', 'test2_id');
+    }
 }
