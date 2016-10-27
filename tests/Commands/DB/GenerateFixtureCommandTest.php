@@ -14,7 +14,31 @@ use Illuminate\Foundation\Console\Kernel;
 
 class GenerateFixtureCommandTest extends TestCase
 {
+    /** @var ModelExtractor */
+    private $extractor;
+
     public function testExecute() {
+        $this->artisan('db:generate-fixture', [
+            'models' => [
+                TestModel::class . '=1,2,3',
+                Test2Model::class . '=1-15',
+                Model::class
+            ]
+        ]);
+
+        $this->assertEquals([
+            TestModel::class => '1,2,3',
+            Test2Model::class => '1-15',
+            Model::class => '*'
+        ], $this->extractor->criteria);
+    }
+
+    public function testAssociation() {}
+
+    protected function setUp()
+    {
+        parent::setUp();
+
         $this->app->singleton(ModelExtractor::class, function (Container $app) {
             return new class($app) extends ModelExtractor {
                 public $criteria;
@@ -30,23 +54,12 @@ class GenerateFixtureCommandTest extends TestCase
             };
         });
 
-        $extractor = $this->app->make(ModelExtractor::class);
+        $this->extractor = $this->app->make(ModelExtractor::class);
+
         /** @var Kernel $kernel */
         $kernel = $this->app->make(KernelContract::class);
         $kernel->registerCommand($this->app->make(GenerateFixtureCommand::class));
 
-        $this->artisan('db:generate-fixture', [
-            'models' => [
-                TestModel::class . '=1,2,3',
-                Test2Model::class . '=1-15',
-                Model::class
-            ]
-        ]);
-
-        $this->assertEquals([
-            TestModel::class => '1,2,3',
-            Test2Model::class => '1-15',
-            Model::class => '*'
-        ], $extractor->criteria);
     }
+
 }

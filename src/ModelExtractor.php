@@ -3,7 +3,9 @@ namespace Rnr\Alice;
 
 
 use Illuminate\Contracts\Container\Container;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\Pivot;
 use Rnr\Alice\Exceptions\FillerNotFoundException;
 use Rnr\Alice\Fillers\AbstractFiller;
 use Rnr\Alice\Fillers\BelongsToManyFiller;
@@ -28,6 +30,7 @@ class ModelExtractor
 
     public function extract($criteria) {
         $entities = [];
+        $elements = [];
 
         foreach ($criteria as $class => $data) {
             if (is_array($data)) {
@@ -53,19 +56,55 @@ class ModelExtractor
                 $ranger->applyTo($query);
             }
 
-            $data = $query->with($relations)->get();
+            $elements = $this->addElements($elements, $query->with($relations)->get()->all());
+        }
 
+        /** @var Model $item */
+        foreach ($elements as $item) {
+            $class = get_class($item);
             $entities[$class] = $entities[$class] ?? [];
 
-            /** @var Model $item */
-            foreach ($data as $item) {
-                $entities[$class][$this->prefixer->getKey($item)] = $this->getArray($item);
-            }
+            $entities[$class][$this->prefixer->getKey($item)] = $this->getArray($item);
         }
 
         return $entities;
     }
 
+    /**
+     * @param Model[] $elements
+     * @param Model []$models
+     * @return Model[]
+     */
+    public function addElements($elements, $models) {
+        foreach ($models as $model) {
+            foreach ($this->getRelatedElements($model) as $element) {
+                $key = $this->prefixer->getKey($element);
+
+                if (!($element instanceof  Pivot) and empty($elements[$key])) {
+                    $elements[$key] = $element;
+                }
+            }
+        }
+
+        return $elements;
+    }
+
+    public function getRelatedElements(Model $model) {
+        yield $model;
+
+        foreach ($model->getRelations() as $models) {
+            if ($models instanceof Collection) {
+                $models = $models->all();
+            } else if (!is_array($models)) {
+                $models = [$models];
+            }
+
+            foreach ($models as $item) {
+                yield $item;
+                yield from $this->getRelatedElements($item);
+            }
+        }
+    }
 
     public function getArray(Model $item) {
         $data = $item->attributesToArray();

@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Rnr\Alice\ModelExtractor;
+use Rnr\Alice\Support\PrefixCalculator;
 use Rnr\Tests\Alice\Mocks\RelationsModel;
 use Rnr\Tests\Alice\Mocks\Test2Model;
 use Rnr\Tests\Alice\Mocks\TestModel;
@@ -64,7 +65,6 @@ class ModelExtractorTest extends TestCase
                 'range' => '1',
                 'relations' => ['many', 'one', 'manyToMany']
             ],
-            Test2Model::class => [],
             RelationsModel::class => [
                 'relations' => ['belongs']
             ]
@@ -143,6 +143,47 @@ class ModelExtractorTest extends TestCase
         $this->assertRelationData(['@test-1'], [$testModel],
             new BelongsToMany($testModel->newQuery(), $testModel, 'links', '', '', '')
         );
+    }
+
+    public function testAddElement() {
+        $test2 = array_map(function ($id) {
+            return new Test2Model([
+                'id2' => $id
+            ]);
+        }, range(1, 4));
+
+        $test1 = new TestModel([
+            'id' => 1
+        ]);
+
+        $test1->setRelations([
+            'one' => $test2[0],
+            'many' => $test2,
+            'manyToMany' => $test2
+        ]);
+
+        $relation = new RelationsModel([
+            'id' => 1
+        ]);
+
+        $relation->setRelations([
+            'belongs' => $test1
+        ]);
+
+        $actual = $this->extractor->addElements([], [$relation]);
+
+        $prefixer = new PrefixCalculator();
+        $expected = [];
+
+        foreach ($test2 as $item) {
+            $expected[$prefixer->getKey($item)] = $item;
+        }
+
+        $expected[$prefixer->getKey($test1)] = $test1;
+        $expected[$prefixer->getKey($relation)] = $relation;
+
+
+        $this->assertEquals($expected, $actual);
     }
 
     public function assertRelationData($actual, $data, $relation) {
