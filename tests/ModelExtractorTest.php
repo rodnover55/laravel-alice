@@ -2,8 +2,14 @@
 namespace Rnr\Tests\Alice;
 
 
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Rnr\Alice\ModelExtractor;
+use Rnr\Tests\Alice\Mocks\RelationsModel;
 use Rnr\Tests\Alice\Mocks\Test2Model;
 use Rnr\Tests\Alice\Mocks\TestModel;
 use Symfony\Component\Yaml\Yaml;
@@ -13,12 +19,11 @@ class ModelExtractorTest extends TestCase
     /** @var ModelExtractor $extractor */
     private $extractor;
 
-    /** @var Model[] */
-    private $objects;
-
     private $fixture;
 
     public function testExtractSpecifiedTables() {
+        $this->prepareData($this->fixture);
+
         $data = $this->extractor->extract([
             TestModel::class => '*',
             Test2Model::class => '*'
@@ -35,16 +40,119 @@ class ModelExtractorTest extends TestCase
     }
 
     public function testExtractSelectively() {
+        $objects = $this->prepareData($this->fixture);
+
+
         $data = $this->extractor->extract([
             TestModel::class => '1,2,3',
             Test2Model::class => '4-5'
         ]);
 
         $this->assertEquals([
-                TestModel::class => array_only($this->objects, ['test-1', 'test-2', 'test-3']),
-                Test2Model::class => array_only($this->objects, ['test2-4', 'test2-5'])
+                TestModel::class => array_only($objects, ['test-1', 'test-2', 'test-3']),
+                Test2Model::class => array_only($objects, ['test2-4', 'test2-5'])
             ], $data
         );
+    }
+
+    public function testExtractAssociations() {
+        $fixture = __DIR__ . '/fixtures/extractAssociations.yml';
+        $this->fixturesLoader->load($fixture);
+
+        $data = $this->extractor->extract([
+            TestModel::class => [
+                'range' => '1',
+                'relations' => ['many', 'one', 'manyToMany']
+            ],
+            Test2Model::class => [],
+            RelationsModel::class => [
+                'relations' => ['belongs']
+            ]
+        ]);
+
+        $expected = $this->normalize(file_get_contents($fixture));
+        $actual = $this->normalize(Yaml::dump($data, 3, 2));
+
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function testSimpleArray() {
+        $item = new TestModel([
+            'id' => 1,
+            'field1' => '123'
+        ]);
+
+        $this->assertEquals($item->attributesToArray(), $this->extractor->getArray($item));
+    }
+
+    public function testArrayWithHasOneMany() {
+        $item = new TestModel([
+            'id' => 1,
+            'field1' => '123'
+        ]);
+
+        $relation = new Test2Model([
+            'id2' => 5,
+            'intfield' => 123
+        ]);
+
+        $item->setRelations([
+            'many' => new Collection([$relation])
+        ]);
+
+        $this->assertEquals([
+            'many' => ['@test2-5']
+        ] + $item->attributesToArray(), $this->extractor->getArray($item));
+    }
+
+    public function testBelongsTo() {
+        $testModel = new TestModel([
+            'id' => 1
+        ]);
+
+        $this->assertRelationData('@test-1', $testModel,
+            new BelongsTo($testModel->newQuery(), $testModel, '', '', '')
+        );
+    }
+
+    public function testHasOne() {
+        $testModel = new TestModel([
+            'id' => 1
+        ]);
+
+        $this->assertRelationData('@test-1', $testModel,
+            new HasOne($testModel->newQuery(), $testModel, '', '', '')
+        );
+    }
+
+    public function testHasMany() {
+        $testModel = new TestModel([
+            'id' => 1
+        ]);
+
+        $this->assertRelationData(['@test-1'], [$testModel],
+            new HasMany($testModel->newQuery(), $testModel, '', '', '')
+        );
+    }
+
+    public function testBelongsToMany() {
+        $testModel = new TestModel([
+            'id' => 1
+        ]);
+
+        $this->assertRelationData(['@test-1'], [$testModel],
+            new BelongsToMany($testModel->newQuery(), $testModel, 'links', '', '', '')
+        );
+    }
+
+    public function assertRelationData($actual, $data, $relation) {
+        $this->assertEquals($actual, $this->extractor->getRelationData($data, $relation));
+    }
+
+    protected function prepareData($fixture) {
+        return array_map(function (Model $item) {
+            return $item->attributesToArray();
+        }, $this->fixturesLoader->load($fixture));
     }
 
     protected function setUp()
@@ -52,10 +160,6 @@ class ModelExtractorTest extends TestCase
         parent::setUp();
 
         $this->fixture = realpath(__DIR__ . '/fixtures/data.yml');
-
-        $this->objects = array_map(function (Model $item) {
-            return $item->toArray();
-        }, $this->fixturesLoader->load($this->fixture));
 
         $this->extractor = $this->app->make(ModelExtractor::class);
     }

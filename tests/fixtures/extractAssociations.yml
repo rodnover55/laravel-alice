@@ -1,0 +1,21 @@
+Rnr\Tests\Alice\Mocks\TestModel:
+  test-1:
+    id: 1
+    field1: string-1
+    many: ['@test2-1', '@test2-2']
+    one: '@test2-1'
+    manyToMany: ['@test2-2']
+Rnr\Tests\Alice\Mocks\Test2Model:
+  test2-1:
+    id2: 1
+    intfield: '1'
+  test2-2:
+    id2: 2
+    intfield: '1'
+Rnr\Tests\Alice\Mocks\RelationsModel:
+  relations-1:
+    id: 1
+    belongs_id: '1'
+    created_at: '2016-10-27 11:51:44'
+    updated_at: '2016-10-27 11:51:44'
+    belongs: '@test-1'
