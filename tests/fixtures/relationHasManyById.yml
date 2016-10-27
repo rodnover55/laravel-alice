@@ -1,0 +1,4 @@
+Rnr\Tests\Alice\Mocks\TestModel:
+  test:
+    field1: string-1
+    many: [1, 2, 3]

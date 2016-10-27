@@ -2,7 +2,7 @@
     "name": "rnr/laravel-alice",
     "description": "Wrapper of alice fixture generator for laravel",
     "type": "library",
-    "version": "0.8.2",
+    "version": "0.8.3",
     "require": {
         "nelmio/alice": "~2.2",
         "laravel/framework": "~5.1"

@@ -88,6 +88,44 @@ class FixturesLoaderTest extends TestCase
         }
     }
 
+    public function testLoadBelongsToById() {
+        $this->fixturesLoader->load(__DIR__ . '/fixtures/data.yml');
+
+        $relations = $this->fixturesLoader->load(__DIR__ . '/fixtures/relationBelongsToById.yml');
+
+        $this->seeInDatabase('relations', [
+            'id' => $relations['belongs-1']->getKey(),
+            'belongs_id' => 1
+        ]);
+    }
+
+    public function testLoadHasOneById() {
+        $objects = $this->fixturesLoader->load(__DIR__ . '/fixtures/data.yml');
+
+        $objects2 = $this->fixturesLoader->load(__DIR__ . '/fixtures/relationHasManyById.yml');
+
+        foreach (['test2-1', 'test2-2', 'test2-3'] as $key) {
+            $this->seeInDatabase('test2', [
+                'id2' => $objects[$key]->getKey(),
+                'intfield' => $objects2['test']->getKey()
+            ]);
+        }
+    }
+
+    public function testLoadBelongsToManyById() {
+        $objects = $this->fixturesLoader->load(__DIR__ . '/fixtures/data.yml');
+
+        $objects2 = $this->fixturesLoader->load(__DIR__ . '/fixtures/relationBelongsToManyById.yml');
+
+
+        foreach (['test2-1', 'test2-2', 'test2-3', 'test2-4'] as $key) {
+            $this->seeInDatabase('links', [
+                'test_id' => $objects2['test']->getKey(),
+                'test2_id' => $objects[$key]->getKey()
+            ]);
+        }
+    }
+
     /**
      * @param Model[] $objects
      */

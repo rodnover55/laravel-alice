@@ -14,6 +14,12 @@ class BelongsToPopulator implements MethodInterface
             ($object->hasBelongTo($property));
     }
 
+    /**
+     * @param Fixture $fixture
+     * @param ModelWrapper $object
+     * @param string $property
+     * @param mixed $value
+     */
     public function set(Fixture $fixture, $object, $property, $value)
     {
         $object->addBelongTo($property, $value);

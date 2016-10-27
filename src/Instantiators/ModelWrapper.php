@@ -5,6 +5,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasOneOrMany;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use ReflectionMethod;
@@ -24,6 +25,8 @@ class ModelWrapper
 
     /** @var array|self[][] */
     private $manyToMany = [];
+
+    private $dirty = false;
 
     /**
      * @return Model
@@ -55,7 +58,9 @@ class ModelWrapper
     }
 
     public function save(HasOneOrMany $relation = null) {
-        foreach ($this->belongsTo as $name => $model) {
+        foreach ($this->belongsTo as $name => $id) {
+            $model = $this->getRelationModel($name, $id);
+
             if ($model->isDirty()) {
                 $model->save();
             }
@@ -64,11 +69,14 @@ class ModelWrapper
         }
 
         $result = (empty($relation)) ? ($this->model->save()) : ($relation->save($this->model));
+        $this->dirty = false;
 
         foreach ($this->many as $name => $models) {
             $relation = $this->getRelation($name);
 
-            foreach ($models as $model) {
+            foreach ($models as $id) {
+                $model = $this->getRelationModel($name, $id, true);
+
                 if ($model->isDirty()) {
                     $model->save($relation);
                 }
@@ -78,7 +86,9 @@ class ModelWrapper
         foreach ($this->manyToMany as $name => $models) {
             $ids = [];
 
-            foreach ($models as $model) {
+            foreach ($models as $id) {
+                $model = $this->getRelationModel($name, $id);
+
                 if ($model->isDirty()) {
                     $model->save();
                 }
@@ -124,7 +134,7 @@ class ModelWrapper
 
     /**
      * @param $name
-     * @return BelongsToMany
+     * @return BelongsToMany|BelongsTo|HasMany|HasOne
      * @throws RelationNotFoundException
      */
     public function getRelation($name) {
@@ -164,6 +174,41 @@ class ModelWrapper
     }
 
     public function isDirty() {
-        return $this->model->isDirty();
+        return $this->dirty || $this->model->isDirty();
     }
+
+    /**
+     * @param $name
+     * @param int|self $id
+     * @param $dirty
+     * @return self
+     */
+    public function getRelationModel($name, $id, $dirty = false) {
+        if ($id instanceof self) {
+            return $id;
+        }
+
+        /** @var Model $model */
+        $model = $this->getModel()->{$name}()->getRelated()->newQuery()->find($id);
+
+        $wrapper = new self();
+
+        $wrapper->setModel($model);
+        $wrapper->setDirty($dirty);
+
+        return $wrapper;
+    }
+
+    /**
+     * @param boolean $dirty
+     * @return $this
+     */
+    public function setDirty(bool $dirty)
+    {
+        $this->dirty = $dirty;
+
+        return $this;
+    }
+
+
 }

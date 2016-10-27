@@ -1,0 +1,4 @@
+Rnr\Tests\Alice\Mocks\TestModel:
+  test:
+    field1: 'string'
+    manyToMany: [1, 2, 3, 4]

@@ -1,0 +1,4 @@
+Rnr\Tests\Alice\Mocks\RelationsModel:
+  belongs-1:
+    id: ~
+    belongs: 1
