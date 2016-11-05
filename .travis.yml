@@ -1,6 +1,9 @@
 language: php
 php:
   - '7.0'
-script: 
+before_script:
   - cp phpunit.xml.dist phpunit.xml
+ - composer install
+
+script: 
   - vendor/bin/phpunit --configuration phpunit.xml --coverage-text 
