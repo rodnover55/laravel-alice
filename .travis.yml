@@ -3,7 +3,7 @@ php:
   - '7.0'
 before_script:
   - cp phpunit.xml.dist phpunit.xml
- - composer install
+  - composer install
 
 script: 
   - vendor/bin/phpunit --configuration phpunit.xml --coverage-text 
