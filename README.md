@@ -1,4 +1,5 @@
 # LaravelAlice
+[![Package version](https://img.shields.io/packagist/vpre/rnr/laravel-alice.svg)](https://packagist.org/packages/rnr/laravel-alice)
 [![Build Status](https://travis-ci.org/rodnover55/laravel-alice.svg?branch=master)](https://travis-ci.org/rodnover55/laravel-alice)
 
 A [Laravel](https://laravel.com/) package to manage fixtures with [nelmio/alice](https://github.com/nelmio/alice).
