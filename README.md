@@ -100,7 +100,9 @@ This class add new command `db:generate-fixture` to artisan. This command extrac
 Command takes array of models with relations in specific format:
 
 ```
-php artisan db:generate-fixture Model(relations:relation1,realation2.subrelation)=1,2,3-5,17,20-25 Model2(relations:hasOne)=*
+php artisan db:generate-fixture \
+    'Nelmio\Entity\User(relations:relation1,realation2.subrelation)=1,2,3-5,17,20-25' \
+    'Nelmio\Entity\Group(relations:hasOne)=*' > /path/to/fixture.yml
 ```
 
 
