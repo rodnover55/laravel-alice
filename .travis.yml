@@ -2,5 +2,5 @@ language: php
 php:
   - '7.0'
 script: 
-  cp phpunit.xml.dist phpunit.xml
-  vendor/bin/phpunit --configuration phpunit.xml --coverage-text 
+  - cp phpunit.xml.dist phpunit.xml
+  - vendor/bin/phpunit --configuration phpunit.xml --coverage-text 
