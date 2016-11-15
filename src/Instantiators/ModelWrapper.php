@@ -47,14 +47,19 @@ class ModelWrapper
         return $this;
     }
 
-    function __get($name)
+    public function __get($name)
     {
         return $this->model->{$name};
     }
 
-    function __set($name, $value)
+    public function __set($name, $value)
     {
         $this->model->{$name} = $value;
+    }
+
+    function __isset($name)
+    {
+        return array_key_exists($name, $this->model->getAttributes());
     }
 
     public function save(HasOneOrMany $relation = null) {

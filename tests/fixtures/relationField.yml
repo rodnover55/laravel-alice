@@ -1,0 +1,8 @@
+Rnr\Tests\Alice\Mocks\TestModel:
+  test:
+    id: 1
+    field1: string-1
+Rnr\Tests\Alice\Mocks\Test2Model:
+  test2:
+    id2: 1
+    intfield: '@test->id'

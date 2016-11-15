@@ -126,6 +126,15 @@ class FixturesLoaderTest extends TestCase
         }
     }
 
+    public function testValueByRelationField() {
+        $objects = $this->fixturesLoader->load(__DIR__ . '/fixtures/relationField.yml');
+
+        $this->seeInDatabase('test2', [
+            'id' => $objects['test2']->getKey(),
+            'intfield' => $objects['test2']->getKey()
+        ]);
+    }
+
     /**
      * @param Model[] $objects
      */
@@ -135,7 +144,7 @@ class FixturesLoaderTest extends TestCase
         }
     }
 
-    public function assertArrayOfInstace($class, $array) {
+    public function assertArrayOfInstance($class, $array) {
         foreach ($array as $item) {
             $this->assertInstanceOf($class, $item);
         }
