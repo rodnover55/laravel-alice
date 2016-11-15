@@ -6,6 +6,7 @@ use Illuminate\Contracts\Container\Container;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Pivot;
+use Illuminate\Foundation\Application;
 use Rnr\Alice\Exceptions\FillerNotFoundException;
 use Rnr\Alice\Fillers\AbstractFiller;
 use Rnr\Alice\Fillers\BelongsToManyFiller;
@@ -110,7 +111,7 @@ class ModelExtractor
         $data = $item->attributesToArray();
         $relations = $item->getRelations();
 
-        foreach ($relations as $name => $relation) {
+        foreach (array_except($relations, ['pivot']) as $name => $relation) {
             $data[$name] = $this->getRelationData($relation, $item->{$name}());
         }
 
@@ -118,15 +119,23 @@ class ModelExtractor
     }
 
     public function getRelationData($data, $relation) {
+        $fillerFinder = function (AbstractFiller $filler) use ($data, $relation) {
+            return $filler->can($data, $relation);
+        };
+
         /** @var AbstractFiller $filler */
         $filler = array_first([
             new BelongToFiller(),
             new HasOneFiller(),
             new HasManyFiller(),
             new BelongsToManyFiller()
-        ], function (AbstractFiller $filler) use ($data, $relation) {
-            return $filler->can($data, $relation);
-        });
+        ],
+            ((version_compare(Application::VERSION, '5.3', '>=')) ? ($fillerFinder) :
+                (function ($key, AbstractFiller $filler) use ($fillerFinder) {
+                    return $fillerFinder($filler);
+                })
+            )
+        );
 
         if (empty($filler)) {
             throw new FillerNotFoundException('Cannot find filler.');
