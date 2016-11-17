@@ -129,10 +129,12 @@ class FixturesLoaderTest extends TestCase
     public function testValueByRelationField() {
         $objects = $this->fixturesLoader->load(__DIR__ . '/fixtures/relationField.yml');
 
-        $this->seeInDatabase('test2', [
-            'id2' => $objects['test2']->getKey(),
-            'intfield' => $objects['test']->getKey()
-        ]);
+        for ($i = 1; $i <=2; $i++) {
+            $this->seeInDatabase('test2', [
+                'id2' => $objects["test2-{$i}"]->getKey(),
+                'intfield' => $objects["test-{$i}"]->getKey()
+            ]);
+        }
     }
 
     public function testValueByRelationFieldWithoutId() {

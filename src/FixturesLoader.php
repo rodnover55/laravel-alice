@@ -6,6 +6,8 @@ use Illuminate\Contracts\Container\Container;
 use Illuminate\Database\DatabaseManager;
 use Illuminate\Database\Eloquent\Model;
 use Nelmio\Alice\Fixtures\Loader;
+use Nelmio\Alice\Instances\Processor\Methods\Faker;
+use Nelmio\Alice\Instances\Processor\Providers\IdentityProvider;
 use Rnr\Alice\Instantiators\ModelWrapper;
 use Rnr\Alice\Instantiators\ModelWrapperInstantiator;
 use Rnr\Alice\Populators\BelongsToManyPopulator;
@@ -78,6 +80,7 @@ class FixturesLoader
 
         $loader->addInstantiator($this->container->make(ModelWrapperInstantiator::class));
         $loader->addProcessor($this->container->make(ReferenceProcessor::class));
+        $loader->addProcessor(new Faker([new IdentityProvider()]));
 
         $loader->setReferences($entities);
 
