@@ -130,8 +130,8 @@ class FixturesLoaderTest extends TestCase
         $objects = $this->fixturesLoader->load(__DIR__ . '/fixtures/relationField.yml');
 
         $this->seeInDatabase('test2', [
-            'id' => $objects['test2']->getKey(),
-            'intfield' => $objects['test2']->getKey()
+            'id2' => $objects['test2']->getKey(),
+            'intfield' => $objects['test']->getKey()
         ]);
     }
 
