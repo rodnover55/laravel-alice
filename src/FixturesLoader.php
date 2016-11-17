@@ -13,6 +13,7 @@ use Rnr\Alice\Populators\BelongsToPopulator;
 use Rnr\Alice\Populators\HasManyPopulator;
 use Rnr\Alice\Populators\HasOnePopulator;
 use Rnr\Alice\Populators\SimplePopulator;
+use Rnr\Alice\Processors\ReferenceProcessor;
 
 class FixturesLoader
 {
@@ -75,6 +76,7 @@ class FixturesLoader
         }
 
         $loader->addInstantiator($this->container->make(ModelWrapperInstantiator::class));
+        $loader->addProcessor($this->container->make(ReferenceProcessor::class));
 
         return $loader->load($file);
     }
