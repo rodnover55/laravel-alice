@@ -41,22 +41,22 @@ class FixturesLoader
         /** @var ModelWrapper[] $entities */
         $entities = [];
 
-        foreach ((is_array($files) ? $files : [$files]) as $file) {
-            $entities += $this->loadFile($file);
-        }
-
         /** @var DatabaseManager $databaseManager */
         $databaseManager = $this->container->make(DatabaseManager::class);
 
         $connection = $databaseManager->connection();
 
-        $connection->transaction(function () use (&$entities) {
-            foreach ($entities as $entity) {
-                if ($entity->isDirty()) {
-                    $entity->save();
+        foreach ((is_array($files) ? $files : [$files]) as $file) {
+            $entities += $this->loadFile($file, $entities);
+
+            $connection->transaction(function () use (&$entities) {
+                foreach ($entities as $entity) {
+                    if ($entity->isDirty()) {
+                        $entity->save();
+                    }
                 }
-            }
-        });
+            });
+        }
 
         return array_map(function (ModelWrapper $entity) {
             return $entity->getModel();
@@ -65,9 +65,10 @@ class FixturesLoader
 
     /**
      * @param string $file
-     * @return ModelWrapper[]|object[]
+     * @param array $entities
+     * @return \object[]|Instantiators\ModelWrapper[]
      */
-    public function loadFile($file) {
+    public function loadFile($file, $entities = []) {
         /** @var Loader $loader */
         $loader = $this->container->make(Loader::class);
 
@@ -77,6 +78,8 @@ class FixturesLoader
 
         $loader->addInstantiator($this->container->make(ModelWrapperInstantiator::class));
         $loader->addProcessor($this->container->make(ReferenceProcessor::class));
+
+        $loader->setReferences($entities);
 
         return $loader->load($file);
     }

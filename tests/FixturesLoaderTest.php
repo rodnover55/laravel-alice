@@ -135,6 +135,18 @@ class FixturesLoaderTest extends TestCase
         ]);
     }
 
+    public function testValueByRelationFieldWithoutId() {
+        $objects = $this->fixturesLoader->load([
+            __DIR__ . '/fixtures/relationFieldWithoutId.yml',
+            __DIR__ . '/fixtures/relationFieldWithoutId_test2.yml'
+        ]);
+
+        $this->seeInDatabase('test2', [
+            'id2' => $objects['test2']->getKey(),
+            'intfield' => $objects['test']->getKey()
+        ]);
+    }
+
     /**
      * @param Model[] $objects
      */
