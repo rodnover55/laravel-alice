@@ -1,8 +1,9 @@
+Rnr\Tests\Alice\Mocks\Test2Model:
+  test2-{1..3}:
+    id2: ~
+    intfield: 5
+
 Rnr\Tests\Alice\Mocks\TestModel:
   test-1:
     field1: string-1
     many: '@test2-{1..3}'
-
-Rnr\Tests\Alice\Mocks\Test2Model:
-  test2-{1..3}:
-    id2: ~

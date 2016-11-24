@@ -82,9 +82,9 @@ class ModelWrapper
             foreach ($models as $id) {
                 $model = $this->getRelationModel($name, $id, true);
 
-                if ($model->isDirty()) {
+//                if ($model->isDirty()) {
                     $model->save($relation);
-                }
+//                }
             }
         }
 
