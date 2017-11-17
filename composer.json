@@ -4,11 +4,12 @@
     "type": "library",
     "version": "0.8.5.3",
     "require": {
-        "nelmio/alice": "~2.2",
-        "laravel/framework": "~5.1"
+        "nelmio/alice": "~3.1",
+        "laravel/framework": "~5.3"
     },
     "require-dev": {
-        "orchestra/testbench": "~3.1",
+        "orchestra/testbench": "~3.3",
+        "orchestra/database": "~3.3.0@dev",
         "phpunit/phpunit": "~5.5"
     },
     "autoload": {

@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use Nelmio\Alice\Fixtures\Loader;
 use Nelmio\Alice\Instances\Processor\Methods\Faker;
 use Nelmio\Alice\Instances\Processor\Providers\IdentityProvider;
+use Nelmio\Alice\Loader\NativeLoader;
 use Rnr\Alice\Instantiators\ModelWrapper;
 use Rnr\Alice\Instantiators\ModelWrapperInstantiator;
 use Rnr\Alice\Populators\BelongsToManyPopulator;
@@ -40,25 +41,27 @@ class FixturesLoader
      * @return array|Model[]
      */
     public function load($files) {
-        /** @var ModelWrapper[] $entities */
-        $entities = [];
-
         /** @var DatabaseManager $databaseManager */
         $databaseManager = $this->container->make(DatabaseManager::class);
 
         $connection = $databaseManager->connection();
 
-        foreach ((is_array($files) ? $files : [$files]) as $file) {
-            $entities += $this->loadFile($file, $entities);
+        $loader = new EloquentLoader();
 
-            $connection->transaction(function () use (&$entities) {
-                foreach ($entities as $entity) {
-                    if ($entity->isDirty()) {
-                        $entity->save();
-                    }
+        $files = (is_array($files)) ? ($files) : ([$files]);
+
+        /**
+         * @var ModelWrapper[] $entities
+         */
+        $entities = $loader->loadFiles($files)->getObjects();
+
+        $connection->transaction(function () use (&$entities) {
+            foreach ($entities as $entity) {
+                if ($entity->isDirty()) {
+                    $entity->save();
                 }
-            });
-        }
+            }
+        });
 
         return array_map(function (ModelWrapper $entity) {
             return $entity->getModel();

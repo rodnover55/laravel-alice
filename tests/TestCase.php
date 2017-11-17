@@ -18,7 +18,7 @@ class TestCase extends ParentTestCase
         $config->set('database.default', 'testing');
     }
 
-    protected function setUp()
+    public function setUp()
     {
         parent::setUp();
 
