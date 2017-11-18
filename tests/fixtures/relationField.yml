@@ -1,7 +1,7 @@
 Rnr\Tests\Alice\Mocks\TestModel:
-  test-{1..2}:
+  test_{1..2}:
     id: '<current()>'
     field1: string-1
 Rnr\Tests\Alice\Mocks\Test2Model:
-  test2-{1..2}:
-    intfield: '@test-<current()>->id'
+  test2_{1..2}:
+    intfield: '@test_$current->id'

@@ -10,7 +10,7 @@ use Nelmio\Alice\Instances\Processor\Methods\Faker;
 use Nelmio\Alice\Instances\Processor\Providers\IdentityProvider;
 use Nelmio\Alice\Loader\NativeLoader;
 use Rnr\Alice\Instantiators\ModelWrapper;
-use Rnr\Alice\Instantiators\ModelWrapperInstantiator;
+use Rnr\Alice\Instantiators\ModelWrapperGenerator;
 use Rnr\Alice\Populators\BelongsToManyPopulator;
 use Rnr\Alice\Populators\BelongsToPopulator;
 use Rnr\Alice\Populators\HasManyPopulator;
@@ -66,27 +66,5 @@ class FixturesLoader
         return array_map(function (ModelWrapper $entity) {
             return $entity->getModel();
         }, $entities);
-    }
-
-    /**
-     * @param string $file
-     * @param array $entities
-     * @return \object[]|Instantiators\ModelWrapper[]
-     */
-    public function loadFile($file, $entities = []) {
-        /** @var Loader $loader */
-        $loader = $this->container->make(Loader::class);
-
-        foreach ($this->populators as $populator) {
-            $loader->addPopulator($this->container->make($populator));
-        }
-
-        $loader->addInstantiator($this->container->make(ModelWrapperInstantiator::class));
-        $loader->addProcessor($this->container->make(ReferenceProcessor::class));
-        $loader->addProcessor(new Faker([new IdentityProvider()]));
-
-        $loader->setReferences($entities);
-
-        return $loader->load($file);
     }
 }

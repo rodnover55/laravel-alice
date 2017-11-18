@@ -74,10 +74,10 @@ class FixturesLoaderTest extends TestCase
 
         /** @var Model[][] $links */
         $links = [
-            [$objects['test-1'], $objects['test2-1']],
-            [$objects['test-2'], $objects['test2-1']],
-            [$objects['test-1'], $objects['test2-2']],
-            [$objects['test-2'], $objects['test2-2']]
+            [$objects['test_1'], $objects['test2_1']],
+            [$objects['test_2'], $objects['test2_1']],
+            [$objects['test_1'], $objects['test2_2']],
+            [$objects['test_2'], $objects['test2_2']]
         ];
 
         foreach ($links as $link) {
@@ -131,13 +131,14 @@ class FixturesLoaderTest extends TestCase
 
         for ($i = 1; $i <=2; $i++) {
             $this->seeInDatabase('test2', [
-                'id2' => $objects["test2-{$i}"]->getKey(),
-                'intfield' => $objects["test-{$i}"]->getKey()
+                'id2' => $objects["test2_{$i}"]->getKey(),
+                'intfield' => $objects["test_{$i}"]->getKey()
             ]);
         }
     }
 
     public function testValueByRelationFieldWithoutId() {
+        $this->markTestSkipped('Currently we cannot use reference to id field for unsaved models.');
         $objects = $this->fixturesLoader->load([
             __DIR__ . '/fixtures/relationFieldWithoutId.yml',
             __DIR__ . '/fixtures/relationFieldWithoutId_test2.yml'

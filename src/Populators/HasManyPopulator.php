@@ -6,9 +6,9 @@ use Nelmio\Alice\Fixtures\Fixture;
 use Nelmio\Alice\Instances\Populator\Methods\MethodInterface;
 use Rnr\Alice\Instantiators\ModelWrapper;
 
-class HasManyPopulator implements MethodInterface
+class HasManyPopulator implements PopulatorInterface
 {
-    public function canSet(Fixture $fixture, $object, $property, $value)
+    public function can(&$object, $property, $value): bool
     {
         return
             ($object instanceof ModelWrapper) and
@@ -16,7 +16,12 @@ class HasManyPopulator implements MethodInterface
             (is_array($value));
     }
 
-    public function set(Fixture $fixture, $object, $property, $value)
+    /**
+     * @param ModelWrapper $object
+     * @param $property
+     * @param $value
+     */
+    public function setValue(&$object, $property, $value)
     {
         $object->addMany($property, $value);
     }
