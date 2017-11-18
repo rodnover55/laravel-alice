@@ -2,9 +2,7 @@
 namespace Rnr\Alice\Populators;
 
 
-use Nelmio\Alice\Fixtures\Fixture;
 use Rnr\Alice\Instantiators\ModelWrapper;
-use Nelmio\Alice\Instances\Populator\Methods\MethodInterface;
 
 class HasOnePopulator implements PopulatorInterface
 {

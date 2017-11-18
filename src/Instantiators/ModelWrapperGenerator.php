@@ -6,11 +6,9 @@ use Illuminate\Database\Eloquent\Model;
 use Nelmio\Alice\Definition\Object\SimpleObject;
 use Nelmio\Alice\FixtureInterface;
 use Nelmio\Alice\Generator\GenerationContext;
-use Nelmio\Alice\Generator\InstantiatorInterface;
 use Nelmio\Alice\Generator\ResolvedFixtureSet;
 use Nelmio\Alice\Generator\ObjectGeneratorInterface;
 use Nelmio\Alice\ObjectBag;
-use Nelmio\Alice\Throwable\GenerationThrowable;
 
 class ModelWrapperGenerator implements ObjectGeneratorInterface
 {
