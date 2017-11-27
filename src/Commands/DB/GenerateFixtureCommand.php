@@ -11,7 +11,7 @@ class GenerateFixtureCommand extends Command
     protected $signature =
         'db:generate-fixture
             {models* : Models with ids to extract }';
-    protected $description = 'Start web socket server.';
+    protected $description = 'Create database fixtures from the database.';
 
     public function handle(ModelExtractor $extractor) {
         $criteria = [];
